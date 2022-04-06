@@ -6,6 +6,7 @@ import cv2.cv2 as cv
 from PIL import Image
 from os import listdir
 from os.path import join, isfile
+from matplotlib import pyplot as plt
 
 def hello_world():
     print("Hello, World!")
@@ -18,10 +19,10 @@ def random_string_without_spaces(N):
 
 def generate_catpcha(captcha_amount, captcha_length):
     for amount in range(captcha_amount):
-        image = ImageCaptcha(width = 280, height = 90)
+        image = ImageCaptcha(width = 40, height = 90)
         captcha_text = random_string(captcha_length)
         data = image.generate(captcha_text)
-        image.write(captcha_text, 'data/captchas/'+random_string_without_spaces(6)+'.png')
+        image.write(captcha_text, 'data/captchas/'+random_string_without_spaces(5)+'.png')
     
 def source_from_dir(dir):
     print(dir)
@@ -46,6 +47,25 @@ def image_annotation(fileList):
         print('After: ')
         print(img.histogram())
         img.save('data/test/'+captcha)
+
+def denoising(fileList):
+    for captcha in fileList:
+        captchaName = 'data/captcha/'+captcha
+        print('Captcha name: '+captchaName)
+        img = cv.imread('data/captcha/E.png')
+        b,g,r = cv.split(img)           # get b,g,r
+        rgb_img = cv.merge([r,g,b])     # switch it to rgb
+
+        # Denoising
+        dst = cv.fastNlMeansDenoisingColored(img,None,10,10,7,21)
+
+        b,g,r = cv.split(dst)           # get b,g,r
+        rgb_dst = cv.merge([r,g,b])     # switch it to rgb
+
+        plt.subplot(211),plt.imshow(rgb_img)
+        plt.subplot(212),plt.imshow(rgb_dst)
+        plt.show()
+        cv.imwrite('data/test/'+captcha, rgb_dst)
 
 def crop(fileList, out_directory):
     #print("Hello, World!")
@@ -84,9 +104,10 @@ def crop(fileList, out_directory):
 
 if __name__=='__main__':
     hello_world()
-    generate_catpcha(1,6)
+    generate_catpcha(1,1)
     fileList = source_from_dir('data/captchas')
     image_annotation(fileList)
+    #denoising(fileList)
     fileList = source_from_dir('data/test')
     crop(fileList, 'data/crop_captchas')
     
