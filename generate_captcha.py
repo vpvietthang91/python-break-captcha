@@ -38,9 +38,9 @@ def image_annotation(fileList):
         print('Captcha name: '+captchaName)
         src = cv.imread(captchaName, 0)
         img = cv.cvtColor(src, cv.COLOR_GRAY2BGR)
-        dst = cv.fastNlMeansDenoisingColored(img, None, 10 ,10 ,7 ,21)
+        dst = cv.fastNlMeansDenoisingColored(img, None, 30 ,30 ,7 ,21)
         cv.imwrite('data/test/'+captcha, dst)
-        img = Image.open('data/test/'+captcha).convert('P')
+        img = Image.open('data/test/'+captcha).convert('L')
         print('Before: ')
         print(img.histogram())
         img = img.point(lambda x: 0 if x<128 else 255, '1')
@@ -104,11 +104,7 @@ def crop(fileList, out_directory):
 
 if __name__=='__main__':
     hello_world()
-<<<<<<< HEAD
-    generate_catpcha(1,1)
-=======
-    generate_catpcha(100,1)
->>>>>>> cbf7dcbc (rebase)
+    #generate_catpcha(1,1)
     fileList = source_from_dir('data/captchas')
     image_annotation(fileList)
     #denoising(fileList)
