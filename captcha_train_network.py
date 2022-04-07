@@ -100,7 +100,7 @@ if __name__ == "__main__":
     (train_x, validation_x, train_y, validation_y) = train_test_split(n_data, n_labels, test_size=0.3, random_state=42)
 
     print("Training network...")
-    # nome do arquivo com timestamp    
+    # add timestamp    
     timestr = time.strftime("%Y%m%d-%H%M%S")
     model_name = f"model-md[{str(min_delta)}]-pt[{str(patience)}]"
     print(f"Model name: {model_name}")
