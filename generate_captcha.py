@@ -104,7 +104,11 @@ def crop(fileList, out_directory):
 
 if __name__=='__main__':
     hello_world()
+<<<<<<< HEAD
     generate_catpcha(1,1)
+=======
+    generate_catpcha(100,1)
+>>>>>>> cbf7dcbc (rebase)
     fileList = source_from_dir('data/captchas')
     image_annotation(fileList)
     #denoising(fileList)

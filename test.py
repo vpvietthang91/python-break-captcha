@@ -1,47 +1,124 @@
-from tkinter.font import Font
-from PIL import ImageFont, ImageDraw, Image
-import cv2
-import random, string
 import numpy as np
-import glob
+import random
+import string
+import sys
 
-font_path = r'C:\Windows\Fonts'
-fonts = glob.glob(font_path+'\\ari*.ttf')
-fonts
-print(fonts)
+from PIL import Image, ImageDraw, ImageFont
 
-# Setting up the canvas
-size = random.randint(10,16)
-length = random.randint(4,8)
-img = np.zeros(((size*2)+5, length*size, 3), np.uint8)
-img_pil = Image.fromarray(img+255)
+# fonte usada (bistream vera)
+font = ImageFont.truetype('Vera.ttf', size=50)
 
-# Drawing text and lines
-font = ImageFont.truetype(random.choice(fonts), size)
-draw = ImageDraw.Draw(img_pil)
-text = ''.join(
-    random.choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) 
-               for _ in range(length))
-draw.text((5, 10), text, font=font, 
-          fill=(random.randint(0,255), random.randint(0,255), random.randint(0,255)))
-draw.line([(random.choice(range(length*size)), random.choice(range((size*2)+5)))
-           ,(random.choice(range(length*size)), random.choice(range((size*2)+5)))]
-          , width=1, fill=(random.randint(0,255), random.randint(0,255), random.randint(0,255)))
+# caminho
+#path = "../dataset/raw/"
+path = "data/captchas/"
 
-# Adding noise and blur
-img = np.array(img_pil)
-thresh = random.randint(1,5)/100
-for i in range(img.shape[0]):
-    for j in range(img.shape[1]):
-        rdn = random.random()
-        if rdn < thresh:
-            img[i][j] = random.randint(0,123)
-        elif rdn > 1-thresh:
-            img[i][j] = random.randint(123,255)
-img = cv2.blur(img,(int(size/random.randint(5,10)),int(size/random.randint(5,10))))
+def rndPointDisposition(dx, dy):
+    """Return random disposition point."""
+    x = int(random.uniform(-dx, dx))
+    y = int(random.uniform(-dy, dy))
+    return (x, y)
 
-#Displaying image
-cv2.imshow(f"{text}", img)
-cv2.waitKey()
-cv2.destroyAllWindows()
-cv2.imwrite(f"data/{text}.png", img) #if you want to save the image
+def quadPoints(size, disp1, disp2):
+    """Return points for QUAD transformation."""
+    w, h = size
+    x1, y1 = disp1
+    x2, y2 = disp2
+
+    return (
+        x1,    -y1,
+        -x1,    h + y2,
+        w + x2, h - y2,
+        w - x2, y1)
+    
+def rndLineTransform(image):
+    """Randomly morph Image object with drawn line."""
+    w, h = image.size
+
+    # default: 0.3 0.5
+    dx = w * random.uniform(0.2, 0.4)
+    dy = h * random.uniform(0.2, 0.4)
+
+    x1, y1 = [abs(z) for z in rndPointDisposition(dx, dy)]
+    x2, y2 = [abs(z) for z in rndPointDisposition(dx, dy)]
+
+    quad = quadPoints((w, h), (x1, y1), (x2, y2))
+
+    return image.transform(image.size, Image.QUAD,
+                            data=quad, resample=Image.BICUBIC, fill=1)
+
+def deform_image(image):
+    transformed_image = rndLineTransform(image)
+
+    new_image = Image.new('RGBA', (190, 80), color=(255, 255, 255))
+    new_image.paste(transformed_image, transformed_image)
+
+    return new_image
+
+def draw_cross(ctx, x, y):
+    ctx.point((x, y), 'black')
+    ctx.point((x+1, y), 'black')
+    ctx.point((x-1, y), 'black')
+    ctx.point((x, y+1), 'black')
+    ctx.point((x, y-1), 'black')
+
+def draw_random_cross(ctx):
+    x1 = random.randint(1, 189)
+    y1 = random.randint(1, 79)
+
+    draw_cross(ctx, x1, y1)
+
+def draw_random_line(ctx):
+    x1 = random.randint(0, 190)
+    y1 = random.randint(0, 80)
+
+    x2 = random.randint(0, 190)
+    y2 = random.randint(0, 80)
+    ctx.line((x1, y1, x2, y2), 'black')
+
+def draw_random_stuff(ctx):
+    num_crosses = random.randint(80, 90)
+
+    for i in range(num_crosses):
+        draw_random_cross(ctx)   
+    
+    num_lines = random.randint(5, 7)
+
+    for i in range(num_lines):
+        draw_random_line(ctx)
+
+def gen_captcha(text):
+    # cria uma imagem branca de 190x80
+    image = Image.new('RGBA', (190, 80), color=(255, 255, 255))
+    draw = ImageDraw.Draw(image)
+
+    # passo 1: desenha pontos e linhas aleatorias sem deformação e o texto
+    draw_random_stuff(draw)
+    draw.text((40, 20), text, fill='black', font=font)
+    del draw
+
+    # passo 2: transforma a imagem
+    image = deform_image(image)
+
+    # passo 3: repetir passo 1
+    draw = ImageDraw.Draw(image)
+    draw_random_stuff(draw)
+    del draw
+
+    return image
+
+def gen_string(size=4, chars=string.ascii_lowercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
+
+if len(sys.argv) == 1:
+    print("ha")
+else:
+    num = int(sys.argv[1])
+    print(f"Gerando {num} captchas")
+
+    for i in range(num):
+        if i % 10 == 0:
+            print(f"{str(i)} CAPTCHAS gerados")
+        text = gen_string()
+        image = gen_captcha(text)
+        filename = text + ".png"
+        image.save(path + filename)
