@@ -12,13 +12,11 @@ font = ImageFont.truetype('Vera.ttf', size=50)
 path = "data/raw/"
 
 def rndPointDisposition(dx, dy):
-    """Return random disposition point."""
     x = int(random.uniform(-dx, dx))
     y = int(random.uniform(-dy, dy))
     return (x, y)
 
 def quadPoints(size, disp1, disp2):
-    """Return points for QUAD transformation."""
     w, h = size
     x1, y1 = disp1
     x2, y2 = disp2
@@ -30,7 +28,6 @@ def quadPoints(size, disp1, disp2):
         w - x2, y1)
     
 def rndLineTransform(image):
-    """Randomly morph Image object with drawn line."""
     w, h = image.size
 
     # default: 0.3 0.5
@@ -102,7 +99,7 @@ def gen_captcha(text):
 
     return image
 # size=5 Captcha length
-def gen_string(size=5, chars=string.ascii_lowercase + string.ascii_uppercase + string.digits):
+def gen_string(size=5, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 if len(sys.argv) == 1:

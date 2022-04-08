@@ -13,10 +13,10 @@ for alphabet in {a..z}; do
   echo "creating data/segmented/${alphabet}"
   mkdir -p data/segmented/$alphabet
 done
-for alphabet in {A..Z}; do
-  echo "creating data/segmented/${alphabet}"
-  mkdir -p data/segmented/$alphabet
-done
+#for alphabet in {A..Z}; do
+#  echo "creating data/segmented/${alphabet}"
+#  mkdir -p data/segmented/$alphabet
+#done
 for number in {0..9}; do
   echo "creating data/segmented/${number}"
   mkdir -p data/segmented/${number}

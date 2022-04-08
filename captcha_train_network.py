@@ -84,9 +84,11 @@ def train_network(train_x, train_y, validation_x, validation_y, epochs, learning
 
 if __name__ == "__main__":
     num_samples = 2000
-    epochs = 1024
+    #epochs = 1024
+    epochs = 50
     learning_rate = 1e-3
-    batch_size = 128
+    #batch_size = 128
+    batch_size = 256
     validation_split=0.66
     min_delta = 1e-6
     patience = 10
