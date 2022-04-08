@@ -66,8 +66,8 @@ for file in files:
 
     objects.sort(key=lambda t: t[0])
 
-    num_detected = min(len(objects), 4)
-
+    #num_detected = min(len(objects), 4)
+    num_detected = min(len(objects), 5)
     for i in range(num_detected):
         o = objects[i]
         x = o[0]
@@ -82,8 +82,8 @@ for file in files:
 
         filename = "/" + str(counts[letter]).zfill(5) + ".png"
 
-        #path = seg_path + letter + "/" + filename
-        path = seg_path + letter + filename
+        path = seg_path + letter + "/" + filename
+        #path = seg_path + letter + filename
         print("Save crop: "+path)
         cv2.imwrite(path, img)
         counts[letter] += 1

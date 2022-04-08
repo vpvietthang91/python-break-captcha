@@ -102,7 +102,7 @@ def gen_captcha(text):
 
     return image
 # size=5 Captcha length
-def gen_string(size=5, chars=string.ascii_lowercase + string.digits):
+def gen_string(size=5, chars=string.ascii_lowercase + string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 if len(sys.argv) == 1:
