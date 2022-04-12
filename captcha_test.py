@@ -4,6 +4,7 @@ import imutils
 import cv2
 import sys
 import string
+import timeit
 
 from os import listdir
 from os.path import splitext
@@ -79,19 +80,27 @@ for o in objects:
     
     # plt.imshow(rgb)
     # plt.show()
+
+    decode_times = []
     
     rgb = cv2.resize(rgb, (30, 30))
     rgb = rgb.astype("float32") / 255.0
     rgb = np.expand_dims(rgb, axis=0)
 
+    start = timeit.default_timer()
     out = model.predict(rgb)
     decoded = decode(out)
     letters.append(decoded)
+    end = timeit.default_timer()
+
+    time = (end - start)
+    decode_times.append(time)
 
 final_str = ''.join(letters)
 
 rgb = cv2.cvtColor(orig_image, cv2.COLOR_GRAY2RGB)
 
-plt.title(final_str)
+print(decode_times)
+plt.title(final_str+" Decode time: "+str(decode_times)+" ms")
 plt.imshow(rgb)
 plt.show()
